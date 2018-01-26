@@ -13,54 +13,27 @@
 		<input type="search" placeholder="Buscar">
 		<div>
 			<ul id="menu">
-	   			<li><input type="checkbox" name="list" id="nivel1-1"><label for="nivel1-1">Pizzas</label>
-	   				<ul class="interior">
-	         			<li><a>Nivel 2</a>
-	         			</li>
-	         			<li><a>Nivel 2</a>
-	         			</li>
-	      			</ul>
-	   			</li>
-	   			<li><input type="checkbox" name="list" id="nivel1-2"><label for="nivel1-2">Pastas</label>
-	      			<ul class="interior">
-	        			<li><a>Nivel 2</a>
-	         			</li>
-	         			<li><a>Nivel 2</a>
-	         			</li>
-	      			</ul>
-	   			</li>
-	   			<li><input type="checkbox" name="list" id="nivel1-3"><label for="nivel1-3">Ensaladas</label>
-	   				<ul class="interior">
-	         			<li><a>Nivel 2</a>
-	         			</li>
-	         			<li><a>Nivel 2</a>
-	         			</li>
-	      			</ul>
-	   			</li>
-	   			<li><input type="checkbox" name="list" id="nivel1-4"><label for="nivel1-4">Bebidas</label>
-	      			<ul class="interior">
-	        			<li><a>Nivel 2</a>
-	         			</li>
-	         			<li><a>Nivel 2</a>
-	         			</li>
-	      			</ul>
-	   			</li>
-	   			<li><input type="checkbox" name="list" id="nivel1-5"><label for="nivel1-5">Postres</label>
-	   				<ul class="interior">
-	         			<li><a>Nivel 2</a>
-	         			</li>
-	         			<li><a>Nivel 2</a>
-	         			</li>
-	      			</ul>
-	   			</li>
-	   			<li><input type="checkbox" name="list" id="nivel1-6"><label for="nivel1-6">Entradas</label>
-	      			<ul class="interior">
-	        			<li><a>Nivel 2</a>
-	         			</li>
-	         			<li><a>Nivel 2</a>
-	         			</li>
-	      			</ul>
-	   			</li>
+				<?php
+					include './php/conexion.php';
+					$result=$mysqli->query("SELECT * FROM categorias")or die($mysqli->error);
+					//a partir de acá comienza a imprimir en pantalla
+					while ($categorias= mysqli_fetch_array($result)) {
+						$cat1=$categorias['categoria'];
+						//imprime el nombre de la categoria
+						echo "<li><input type='checkbox' name='list' id='nivel1-".$categorias['idCategoria']."'><label for='nivel1-".$categorias['idCategoria']."'>".$categorias['categoria']."</label>";
+
+						//obtiene los nombres de las subcategorias pertenecientes a esa categoria
+						$result2 = $mysqli->query("SELECT * FROM productos WHERE categoria LIKE '%$cat1%'") or die($mysqli->error);
+						//mientras haya registros los imprime
+						while ($subcat = mysqli_fetch_array($result2)) {
+							echo "<ul class='interior'>
+											<li><a href='inventario.php?id=".$subcat['clave']."&clave=".$subcat['idProducto']."&mesa=".$_GET['mesa']." 'name='".$subcat['idProducto']."'>".$subcat['producto']."</a>
+											</li>
+										</ul>";
+						}
+						echo "</li>";
+					}
+				?>
 			</ul>
 		</div>
 	</div>
@@ -75,30 +48,29 @@
 	  </ul>
 	</nav>
 	<div class="miniheader" style="background-color: gray; height: 180px; margin-top: -120px;">
-		<label>La Condesa</label>
-		<ul><b>Ingredientes</b>
-			<li>Tomate deshidratado</li>
-			<li>Cebolla caramelizada</li>
-			<li>Aceituna negra</li>
-			<li>Pepperoni</li>
-			<li>Tomate deshidratado</li>
-			<li>Cebolla caramelizada</li>
-			<li>Aceituna negra</li>
-			<li>Pepperoni</li>
-			<li>Tomate deshidratado</li>
-			<li>Cebolla caramelizada</li>
-			<li>Aceituna negra</li>
-			<li>Pepperoni</li>
-			<li>Tomate deshidratado</li>
-			<li>Cebolla caramelizada</li>
-			<li>Aceituna negra</li>
-			<li>Pepperoni</li>
-		</ul>
-		<p> <b>Precio</b><br>$140.00</p>
-		<button id="btnEliminar"></button>
+		<?php
+			$nombreProd = $mysqli->query("SELECT productos.*,ingredientes.ingredientes FROM productos, ingredientes where productos.idProducto=ingredientes.idProducto and productos.idProducto=".$_GET["clave"]) or die($mysqli->error);
+			if($registro = mysqli_fetch_array($nombreProd)){
+				echo "<label>".$registro['producto']."</label>";
+				echo "<p><b>Precio</b><br>$".$registro['precio']."</p>
+				";
+				echo "<div id='ingre'>";
+				echo "<ul><b>Ingredientes</b>";
+				while ($fila = mysqli_fetch_array($nombreProd)) {
+					echo "<li>".$fila['ingredientes']."</li>";
+				}
+				echo "</ul>";
+				echo "</div>";
+			}
+		?>
 	</div>
 	<div id="container">
-		<img src="http://cdn2.cocinadelirante.com/sites/default/files/images/2017/01/pizzapepperonni.jpg">
+		<?php
+			$getimg = $mysqli->query("select * from categorias, productos where productos.idProducto=".$_GET['clave']." and productos.categoria=categorias.categoria")or die($mysqli->error);
+			if($r=mysqli_fetch_array($getimg)){
+				echo "<img src='./img/".$r['imagen']."''>";
+			}
+		?>
 		<div style="height: 70px;"></div>
 		<hr>
 		<button id="refresh"></button>
@@ -115,7 +87,7 @@
 		</button>
 
 		<h4>Modificar Producto</h4>
-		<form action="../php/insacor.php" method="POST" enctype="multipart/form-data">
+		<form action="../php/insProdss.php" method="POST">
 			<fieldset>
 				<label>Clave</label><br>
 				<input type="text" name="nom" >
@@ -139,12 +111,8 @@
 			<fieldset>
 				<label>Categoria</label><br>
 				<select name="cat">
-					
+
 				</select>
-			</fieldset>
-			<fieldset>
-				<label>Ingredientes</label><br>
-				<input type="text" name="ingredientes">
 			</fieldset>
 			<fieldset>
 				<button type="submit" class="btn">Modificar</button>
@@ -173,20 +141,45 @@
 		</form>
 	</div>
 		</div>
-		<label class="labels" style="margin-top: -260px; font-weight: bold; margin-left: 30px;">Clave</label>
-		<label class="labels" style="margin-top: -240px; font-size: 15px; margin-left: 40px;">1</label>
-		<label class="labels" style="margin-top: -205px; font-weight: bold; margin-left: 30px;">Costo</label>
-		<label class="labels" style="margin-top: -180px; font-size: 15px; margin-left: 40px;">1</label>
-		<label class="labels" style="margin-top: -145px; font-weight: bold; margin-left: 30px;">Stock</label>
-		<label class="labels" style="margin-top: -120px; font-size: 15px; margin-left: 40px;">1</label>
-		<label class="labels" style="margin-top: -260px; font-weight: bold; margin-left: 250px;">Descripción</label>
-		<p style="margin-left: 630px;
-    margin-top: -230px;">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-		tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-		quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-		consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
-		cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-		proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+		<?php
+			$datos=$mysqli->query("select * from productos where idProducto=".$_GET['clave'])or die($mysqli->error);
+			while($mostrar=mysqli_fetch_array($datos)){
+				echo "<div id='mostrarDatos'><label class='labels' style='margin-top: -260px; font-weight: bold; margin-left: 30px;'>Clave</label>
+						<label class='labels' style='margin-top: -240px; font-size: 15px; margin-left: 40px;'>".$mostrar['clave']."</label>
+						<label class='labels' style='margin-top: -205px; font-weight: bold; margin-left: 30px;'>Costo</label>
+						<label class='labels' style='margin-top: -180px; font-size: 15px; margin-left: 40px;'>".$mostrar['costo']."</label>
+						<label class='labels' style='margin-top: -145px; font-weight: bold; margin-left: 30px;'>Stock</label>
+						<label class='labels' style='margin-top: -120px; font-size: 15px; margin-left: 40px;'>".$mostrar['stock']."</label>";
+		?>
+	</div>
+	<?php
+		echo "<label class='labels' style='margin-top: -260px; font-weight: bold; margin-left: 250px;'>Descripción</label>
+		<p style='margin-left: 630px; margin-top: -230px;'>".$mostrar['descripcion'].".</p>";
+	}
+	?>
+
+	<div id="btnagregar22">
+	<i class="fa fa-plus"></i>
+	</div>
+	<div id="alerta22">
+		<button id="cerrar22">
+			<i class="fa fa-times"></i>
+		</button>
+
+		<h4>Agregar Ingredientes</h4>
+		<form action="./php/insIng.php" method="POST" enctype="multipart/form-data">
+			<fieldset style="display:none;">
+				<label>Ingrediente</label><br>
+				<input type="text" name="clave" value=<?php echo $_GET['clave']?>>
+			</fieldset>
+			<fieldset>
+				<label>Ingrediente</label><br>
+				<input type="text" name="ing">
+			</fieldset>
+			<fieldset>
+				<button type="submit" class="btn">Agregar</button>
+			</fieldset>
+		</form>
 	</div>
 
 	<div id="btnagregar">
@@ -198,10 +191,10 @@
 		</button>
 
 		<h4>Agregar Producto</h4>
-		<form action="../php/insacor.php" method="POST" enctype="multipart/form-data">
+		<form action="./php/insProd.php" method="POST" enctype="multipart/form-data">
 			<fieldset>
 				<label>Clave</label><br>
-				<input type="text" name="nom" >
+				<input type="text" name="clave" >
 			</fieldset>
 			<fieldset>
 				<label>Nombre</label><br>
@@ -209,11 +202,15 @@
 			</fieldset>
 			<fieldset>
 				<label>Costo</label><br>
-				<input type="number" name="nom" >
+				<input type="number" name="costo" >
 			</fieldset>
 			<fieldset>
 				<label>Precio</label><br>
-				<input type="number" name="nom" >
+				<input type="number" name="precio" >
+			</fieldset>
+			<fieldset>
+				<label>Stock</label><br>
+				<input type="number" name="stock">
 			</fieldset>
 			<fieldset>
 				<label>Descripcion</label><br>
@@ -221,8 +218,8 @@
 			</fieldset>
 			<fieldset>
 				<label>Categoria</label><br>
-				<select name="cat">
-					<?php 
+				<select name="cat" style="font-size:20px;padding: 5px 8px;width: 100%;height:30px;border: none;box-shadow: none;background: transparent;background-image: none;-webkit-appearance: none;">
+					<?php
 						include './php/conexion.php';
 						$re=$mysqli->query("select * from categorias;")or die($mysqli->error);
 						while($fila=mysqli_fetch_array($re)){
@@ -230,10 +227,6 @@
 						}
 					?>
 				</select>
-			</fieldset>
-			<fieldset>
-				<label>Ingredientes</label><br>
-				<input type="text" name="ingredientes">
 			</fieldset>
 			<fieldset>
 				<button type="submit" class="btn">Insertar</button>
@@ -264,6 +257,31 @@
 			</fieldset>
 		</form>
 	</div>
+
+	<script type="text/javascript">
+		var si=false;
+		window.addEventListener('load',function (argument) {
+			document.getElementById("btnagregar22").addEventListener('click',function(){
+			var div=document.getElementById('alerta22');
+			if(si){
+				div.className ="";
+				si=false;
+				div.style.display="none";
+			}else{
+				div.style.display="block";
+				div.className +="iniciar";
+				si=true;
+			}
+		});
+		document.getElementById("cerrar22").addEventListener('click',function(){
+			var div=document.getElementById('alerta22');
+			div.className ="";
+			si=false;
+			div.style.display="none";
+		});
+		});
+	</script>
+
 	<script type="text/javascript">
 		var si=false;
 		window.addEventListener('load',function (argument) {

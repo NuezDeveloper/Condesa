@@ -7,7 +7,7 @@
 	<link rel="stylesheet" href="./css/font-awesome.min.css">
 	<link rel="stylesheet" type="text/css" href="./css/stylesheet.css">
 	<link rel="stylesheet" type="text/css" href="./css/listas.css">
-	<?php 
+	<?php
 		if(isset($_GET['error'])){
 			printf("<script type='text/javascript'>alert('Favor de llenar todos los campos'); </script>");
 		}
@@ -18,7 +18,7 @@
 		<input type="search" id="txtBuscar" placeholder="Buscar">
 		<div>
 			<ul id="menu">
-				<?php 
+				<?php
 					include './php/conexion.php';
 					$result=$mysqli->query("SELECT * FROM categorias")or die($mysqli->error);
 					//a partir de acá comienza a imprimir en pantalla
@@ -26,7 +26,7 @@
 						$cat1=$categorias['categoria'];
 						//imprime el nombre de la categoria
 						echo "<li><input type='checkbox' name='list' id='nivel1-".$categorias['idCategoria']."'><label for='nivel1-".$categorias['idCategoria']."'>".$categorias['categoria']."</label>";
-									
+
 						//obtiene los nombres de las subcategorias pertenecientes a esa categoria
 						$result2 = $mysqli->query("SELECT * FROM productos WHERE categoria LIKE '%$cat1%'") or die($mysqli->error);
 						//mientras haya registros los imprime
@@ -36,7 +36,7 @@
 											</li>
 										</ul>";
 						}
-						echo "</li>";	
+						echo "</li>";
 					}
 				?>
 
@@ -46,7 +46,7 @@
 	<nav id="header">
 	  <ul>
 	    <li style="background-color: gray; height: 30px; border-top-right-radius: 10px; border-top-left-radius: 10px; margin-left: 5px;"><a href="" style="font-weight: bold; color: black;">Órdenes</a></li>
-	    <li><a href="./inventario.php">Inventario</a></li>
+	    <li><a href="./inventario.php?id=0&clave=0&mesa=0">Inventario</a></li>
 	    <li><a href="">Ventas</a></li>
 	    <li><a href="">Corte</a></li>
 	    <li><a href="">Usuarios</a></li>
@@ -54,7 +54,7 @@
 	  </ul>
 	</nav>
 	<div class="miniheader" style="background-color: gray; height: 180px; margin-top: -120px;">
-		<?php 
+		<?php
 			$nombreProd = $mysqli->query("SELECT productos.*,ingredientes.ingredientes FROM productos, ingredientes where productos.idProducto=ingredientes.idProducto and productos.idProducto=".$_GET["clave"]) or die($mysqli->error);
 			if($registro = mysqli_fetch_array($nombreProd)){
 				echo "<label>".$registro['producto']."</label>";
@@ -64,7 +64,7 @@
 				echo "<ul><b>Ingredientes</b>";
 				while ($fila = mysqli_fetch_array($nombreProd)) {
 					echo "<li>".$fila['ingredientes']."</li>";
-				}	
+				}
 				echo "</ul>";
 				echo "</div>";
 			}
@@ -90,20 +90,24 @@
 			<fieldset>
 				<input type="submit" value="">
 			</fieldset>
-		</form>	
+		</form>
 	</div>
 	<div id="container">
-		<?php 
+		<?php
 			$getimg = $mysqli->query("select * from categorias, productos where productos.idProducto=".$_GET['clave']." and productos.categoria=categorias.categoria")or die($mysqli->error);
 			if($r=mysqli_fetch_array($getimg)){
 				echo "<img src='./img/".$r['imagen']."''>";
 			}
 		?>
 		<div id="mesas">
-			<?php 
-				$mesas = $mysqli->query("select * from referencia");
+			<?php
+				$llevar = $mysqli->query("select * from referencia where mesa='llevar'");
+				while($filallevar = mysqli_fetch_array($llevar)){
+						echo "<a href='./ordenes.php?id=".$_GET['id']."&clave=".$_GET['clave']."&mesa=".$filallevar['idRef']."'>".$filallevar['referencia']."</a>";
+				}
+				$mesas = $mysqli->query("select * from referencia where mesa!='llevar'");
 				while($filaMesas = mysqli_fetch_array($mesas)){
-					echo "<a href='./ordenes.php?id=".$_GET['id']."&clave=".$_GET['clave']."&mesa=".$filaMesas['idRef']."'>Mesa ".$filaMesas['mesa']."</a>";
+						echo "<a href='./ordenes.php?id=".$_GET['id']."&clave=".$_GET['clave']."&mesa=".$filaMesas['idRef']."'>Mesa ".$filaMesas['mesa']."</a>";
 				}
 			?>
 			<button id="btnagregarorden"></button>
@@ -117,6 +121,7 @@
 				<fieldset>
 					<label>Mesa</label><br>
 					<select name="mesa"style="font-size:20px;padding: 5px 8px;width: 100%;height:30px;border: none;box-shadow: none;background: transparent;background-image: none;-webkit-appearance: none;">
+						<option value="llevar">LLEVAR</option>
 						<option value="1">Mesa 1</option>
 						<option value="2">Mesa 2</option>
 						<option value="3">Mesa 3</option>
@@ -142,7 +147,7 @@
 				<fieldset>
 					<label>Mesero</label><br>
 					<select name="mesero" style="font-size:20px;padding: 5px 8px;width: 100%;height:30px;border: none;box-shadow: none;background: transparent;background-image: none;-webkit-appearance: none;">
-						<?php 
+						<?php
 							$re=$mysqli->query("select nombre from empleados;")or die($mysqli->error);
 							while($fila=mysqli_fetch_array($re)){
 								echo "<option value='".$fila['nombre']."'>".$fila['nombre']."</option>";
@@ -176,7 +181,7 @@
 					      <th>Cantidad</th>
 					      <th>Subtotal</th>
 					    </tr>
-					    <?php 
+					    <?php
 					    	$detalleTotal=$mysqli->query("select productos.*,detalle_orden.* from productos,detalle_orden where productos.idProducto=detalle_orden.idProducto and detalle_orden.idOrden=".$_GET['mesa'])or die($mysqli->error);
 					    	while($productos=mysqli_fetch_array($detalleTotal)){
 					    		echo "<tr onclick='alert(this.getElementsByTagName('td')[0].innerHTML);alert(this.innerHTML);'>
@@ -187,12 +192,12 @@
 									      <td>".$productos['subtotal']."</td>
 									  </tr>";
 					    	}
-					    	
+
 					    ?>
 					  </tbody>
 					</table>
 				</div>
-				<label>Total: <?php 
+				<label>Total: <?php
 					$totalCobrar=$mysqli->query("select sum(subtotal) as total from detalle_orden where idOrden=".$_GET['mesa'])or die($mysqli->error());
 					if($existe=mysqli_fetch_array($totalCobrar)){
 						echo $existe['total'];
@@ -211,7 +216,7 @@
 			<button id="cerrarCancelar">
 				<i class="fa fa-times"></i>
 			</button>
-			<h4>Desea cancelar la orden de la mesa <?php 
+			<h4>Desea cancelar la orden de la mesa <?php
 			$mesaCancelar=$mysqli->query("select * from referencia where idRef=".$_GET['mesa'])or die($mysqli->error);
 			if($mostrarMesa=mysqli_fetch_array($mesaCancelar)){
 				echo $mostrarMesa['mesa']."?";
@@ -233,7 +238,7 @@
 			<button id="cerrarModificarMesa">
 				<i class="fa fa-times"></i>
 			</button>
-			<h4>Modificar mesa <?php 
+			<h4>Modificar mesa <?php
 			$mesaCancelar=$mysqli->query("select * from referencia where idRef=".$_GET['mesa'])or die($mysqli->error);
 			if($mostrarMesa=mysqli_fetch_array($mesaCancelar)){
 				echo $mostrarMesa['mesa'];
@@ -271,7 +276,7 @@
 				<fieldset>
 					<label>Mesero</label><br>
 					<select name="mesero" style="font-size:20px;padding: 5px 8px;width: 100%;height:30px;border: none;box-shadow: none;background: transparent;background-image: none;-webkit-appearance: none;">
-						<?php 
+						<?php
 							$re=$mysqli->query("select nombre from empleados;")or die($mysqli->error);
 							while($fila=mysqli_fetch_array($re)){
 								echo "<option value='".$fila['nombre']."'>".$fila['nombre']."</option>";
@@ -288,7 +293,7 @@
 				</fieldset>
 			</form>
 		</div>
-		<?php 
+		<?php
 			$datos=$mysqli->query("select * from orden, referencia where orden.idOrden = referencia.idRef and referencia.idRef=".$_GET['mesa'])or die($mysqli->error);
 			while($mostrar=mysqli_fetch_array($datos)){
 				$total=$mysqli->query("select sum(subtotal) as total from detalle_orden where idOrden=".$_GET['mesa'])or die($mysqli->error());
@@ -317,7 +322,7 @@
 			      <th>Cantidad</th>
 			      <th>Subtotal</th>
 			    </tr>
-			    <?php 
+			    <?php
 			    	$detalle=$mysqli->query("select productos.*,detalle_orden.* from productos,detalle_orden where productos.idProducto=detalle_orden.idProducto and detalle_orden.idOrden=".$_GET['mesa'])or die($mysqli->error);
 			    	while($productos=mysqli_fetch_array($detalle)){
 			    		echo "<tr onclick='alert(this.getElementsByTagName('td')[0].innerHTML);alert(this.innerHTML);'>
@@ -328,7 +333,7 @@
 							      <td>".$productos['subtotal']."</td>
 							  </tr>";
 			    	}
-			    	
+
 			    ?>
 			  </tbody>
 			</table>
