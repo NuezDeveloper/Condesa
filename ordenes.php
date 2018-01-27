@@ -101,13 +101,14 @@
 		?>
 		<div id="mesas">
 			<?php
-				$llevar = $mysqli->query("select * from referencia where mesa='llevar'");
-				while($filallevar = mysqli_fetch_array($llevar)){
-						echo "<a href='./ordenes.php?id=".$_GET['id']."&clave=".$_GET['clave']."&mesa=".$filallevar['idRef']."'>".$filallevar['referencia']."</a>";
-				}
-				$mesas = $mysqli->query("select * from referencia where mesa!='llevar'");
+				$mesas = $mysqli->query("select * from referencia");
 				while($filaMesas = mysqli_fetch_array($mesas)){
+					$valor=$filaMesas['mesa'];
+					if($valor=='llevar'){
+						echo "<a href='./ordenes.php?id=".$_GET['id']."&clave=".$_GET['clave']."&mesa=".$filaMesas['idRef']."'>".$filaMesas['referencia']."</a>";
+					}else{
 						echo "<a href='./ordenes.php?id=".$_GET['id']."&clave=".$_GET['clave']."&mesa=".$filaMesas['idRef']."'>Mesa ".$filaMesas['mesa']."</a>";
+					}
 				}
 			?>
 			<button id="btnagregarorden"></button>
@@ -197,6 +198,13 @@
 					  </tbody>
 					</table>
 				</div>
+				<fieldset style="width:30%;margin-left:15%;float: left;">Pagó:
+					<input type="number" name="txtPagar" value="" style="border: 1px solid red; text-align: center;">
+				</fieldset>
+				<fieldset style="margin-left:1%;float: left;">Cambio:
+					<label>100.00</label>
+				</fieldset>
+				<br>
 				<label>Total: <?php
 					$totalCobrar=$mysqli->query("select sum(subtotal) as total from detalle_orden where idOrden=".$_GET['mesa'])or die($mysqli->error());
 					if($existe=mysqli_fetch_array($totalCobrar)){
