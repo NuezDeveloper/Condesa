@@ -39,7 +39,7 @@
 			<button id="cerrarCobrar">
 				<i class="fa fa-times"></i>
 			</button>
-			<h4>Hacer Corte</h4>
+			<h4>HACER CORTE DE HOY</h4>
 			<form action="./php/cobrar.php" method="POST">
 				<fieldset>
 					<button style="margin-top:20px; margin-left: 43%;background-color:green;" type="submit" class="btn">Corte</button>
@@ -49,15 +49,24 @@
 		<button id="btnEnviar">Imprimir</button>
 		<hr>
 		<div id="tabla">
-			<table class="flat-table">
+			<table class="flat-table" style="width: 100%;">
+				<thead>
+					Ventas por Categoría
+				</thead>
 			  <tbody>
 			    <tr>
-			      <th>Código</th>
-			      <th>Producto</th>
-			      <th>Precio</th>
-			      <th>Cantidad</th>
-			      <th>Subtotal</th>
+			      <th style="width: 50%;">Categoría</th>
+			      <th style="width: 50%;">Monto</th>
 			    </tr>
+					<?php
+						include './php/conexion.php';
+						$r=$mysqli->query("select * from categorias")or die($mysqli->error);
+						while($cats=mysqli_fetch_array($r)){
+							echo "<tr>
+								<td>".$cats['categoria']."</td>";
+						}
+						echo "</tr>";
+					?>
 			  </tbody>
 			</table>
 		</div>
@@ -85,7 +94,6 @@
     });
     });
  </script>
-<script type="text/javascript" src="./js/index.js"></script>
 <script src="./js/datepicker.js"></script>
   <script>
       var input = document.querySelector('input[name="date"]');

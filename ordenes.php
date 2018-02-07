@@ -47,8 +47,8 @@
 	  <ul>
 	    <li style="background-color: gray; height: 30px; border-top-right-radius: 10px; border-top-left-radius: 10px; margin-left: 5px;"><a href="" style="font-weight: bold; color: black;">Órdenes</a></li>
 	    <li><a href="./inventario.php?id=0&clave=0&mesa=0">Inventario</a></li>
-	    <li><a href="./ventas.php?id=0&clave=0&mesa=0">Ventas</a></li>
-	    <li><a href="">Corte</a></li>
+	    <li><a href="./ventas.php?id=0">Ventas</a></li>
+	    <li><a href="./cortes.php">Corte</a></li>
 	    <li><a href="">Usuarios</a></li>
 	    <li><a href="">Sesión</a></li>
 	  </ul>
@@ -198,24 +198,19 @@
 					  </tbody>
 					</table>
 				</div>
-				<fieldset style="width:30%;margin-left:15%;float: left;">Pagó:
+				<fieldset style="width:30%; margin-top: -10px; float: left;">Pago:
 					<input type="number" name="txtPagar" value="" style="border: 1px solid red; text-align: center;">
 				</fieldset>
-				<fieldset style="margin-left:1%;float: left;">Cambio:
+				<fieldset style="margin-left:50%;float: left;margin-top:-10px;">Cambio:
 					<label>100.00</label>
 				</fieldset>
 				<br>
-				<label>Total: <?php
-					$totalCobrar=$mysqli->query("select sum(subtotal) as total from detalle_orden where idOrden=".$_GET['mesa'])or die($mysqli->error());
-					if($existe=mysqli_fetch_array($totalCobrar)){
-						echo $existe['total'];
-					}
-				?></label>
 				<fieldset style="display: none;">
 					<input type="text" name="id" value=<?php echo $_GET['mesa'];?>>
 				</fieldset>
+				<br>
 				<fieldset>
-					<button style="margin-top:20px; margin-left: 43%;background-color:green;" type="submit" class="btn">Cobrar</button>
+					<button style="margin-top: 15px; margin-left: 10%; background-color:green;" type="submit" class="btn">Cobrar</button>
 				</fieldset>
 			</form>
 		</div>
@@ -309,13 +304,13 @@
 						<label class='labels' style='margin-top: -240px; font-size: 15px; margin-left: 40px;'>".$mostrar['idOrden']."</label>
 						<label class='labels' style='margin-top: -205px; font-weight: bold; margin-left: 30px;'>Mesa</label>
 						<label class='labels' style='margin-top: -180px; font-size: 15px; margin-left: 40px;'>".$mostrar['mesa']."</label>
-						<label class='labels' style='margin-top: -145px; font-weight: bold; margin-left: 30px;'>Mesero</label>
-						<label class='labels' style='margin-top: -120px; font-size: 15px; margin-left: 40px;'>".$mostrar['mesero']."</label>
-						<label class='labels' style='margin-top: -85px; font-weight: bold; margin-left: 30px;'>Referencia</label>
-						<label class='labels' style='margin-top: -60px; font-size: 15px; margin-left: 40px;'>".$mostrar['referencia']."</label>
-						<label class='labels' style='margin-top: -30px; font-weight: bold; margin-left: 30px;'>Total</label>";
+						<label class='labels' style='margin-top: -150px; font-weight: bold; margin-left: 30px;'>Mesero</label>
+						<label class='labels' style='margin-top: -125px; font-size: 15px; margin-left: 40px;'>".$mostrar['mesero']."</label>
+						<label class='labels' style='margin-top: -95px; font-weight: bold; margin-left: 30px;'>Referencia</label>
+						<label class='labels' style='margin-top: -70px; font-size: 15px; margin-left: 40px;'>".$mostrar['referencia']."</label>
+						<label class='labels' style='margin-top: 5px; font-weight: bold; margin-left: 30px;'>Total</label>";
 					if($existe=mysqli_fetch_array($total)){
-						echo "<label class='labels' style='margin-top: -10px; font-size: 15px; margin-left: 40px;'>".$existe['total']."</label>
+						echo "<label class='labels' style='margin-top: 5px; font-size: 15px; margin-left: 95px;'>".$existe['total']."</label>
 						</div>";
 					}
 			}
@@ -329,6 +324,7 @@
 			      <th>Precio</th>
 			      <th>Cantidad</th>
 			      <th>Subtotal</th>
+						<th>Cambiar</th>
 			    </tr>
 			    <?php
 			    	$detalle=$mysqli->query("select productos.*,detalle_orden.* from productos,detalle_orden where productos.idProducto=detalle_orden.idProducto and detalle_orden.idOrden=".$_GET['mesa'])or die($mysqli->error);
@@ -339,6 +335,44 @@
 							      <td>".$productos['precio']."</td>
 							      <td>".$productos['cantidad']."</td>
 							      <td>".$productos['subtotal']."</td>
+										<td style='padding:0px;'><form action='./php/agregarProd.php' method='POST'>
+											<fieldset style='display: none;'>
+												<input type='text' name='producto' value=".$productos['idProducto'].">
+											</fieldset>
+											<fieldset style='display: none;'>
+												<input type='text' name='mesa' value=".$_GET['mesa'].">
+											</fieldset>
+											<fieldset>
+												<input type='submit' value='' style='height: 20px;
+											  width: 20px;
+											  margin-left: 20px;
+											  margin-top: 0px;
+											  background-image: url(./img/plus.png);
+											  background-size: cover;
+											  background-color: transparent;
+											  border: none;
+											  position: absolute;'>
+											</fieldset>
+										</form>
+										<form action='./php/borrarProd.php' method='POST'>
+											<fieldset style='display: none;'>
+												<input type='text' name='producto2' value=".$productos['idProducto'].">
+											</fieldset>
+											<fieldset style='display: none;'>
+												<input type='text' name='mesa2' value=".$_GET['mesa'].">
+											</fieldset>
+											<fieldset>
+												<input type='submit' value='' style='height: 20px;
+											  width: 20px;
+											  margin-left: 50px;
+											  margin-top: -30px;
+											  background-image: url(./img/less.png);
+											  background-size: cover;
+											  background-color: transparent;
+											  border: none;
+											  position: absolute;'>
+											</fieldset>
+										</form></td>
 							  </tr>";
 			    	}
 
@@ -440,7 +474,6 @@
 	});
 	});
 </script>
-<script type="text/javascript" src="./js/index.js"></script>
 <script type="text/javascript" src="./js/jquery-3.2.1.min.js"></script>
 </body>
 </html>

@@ -44,7 +44,7 @@
 	</div>
 	<div id="container">
     <button id="btnCobrar">CORTE</button>
-		<div id="cobrar" style="top: 20px;">
+		<div id="cobrar" style="top: 20px; height:100px;">
 			<button id="cerrarCobrar">
 				<i class="fa fa-times"></i>
 			</button>
@@ -162,7 +162,6 @@
 	});
 	});
 </script>
-<script type="text/javascript" src="./js/index.js"></script>
 <script type="text/javascript" src="./js/jquery-3.2.1.min.js"></script>
 </body>
 </html>

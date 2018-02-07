@@ -41,8 +41,8 @@
 	  <ul>
 	    <li><a href="./ordenes.php?id=0&clave=0&mesa=0">Órdenes</a></li>
 	    <li style="background-color: gray; height: 30px; border-top-right-radius: 10px; border-top-left-radius: 10px; margin-left: -7px;"><a href="" style="font-weight: bold; color: black;">Inventario</a></li>
-	    <li><a href="./ventas.php?id=0&clave=0&mesa=0">Ventas</a></li>
-	    <li><a href="">Corte</a></li>
+	    <li><a href="./ventas.php?id=0">Ventas</a></li>
+	    <li><a href="./cortes.php">Corte</a></li>
 	    <li><a href="">Usuarios</a></li>
 	    <li><a href="">Sesión</a></li>
 	  </ul>
