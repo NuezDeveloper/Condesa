@@ -13,19 +13,29 @@
 		if(isset($_GET['error'])){
 			printf("<script type='text/javascript'>alert('Favor de llenar todos los campos'); </script>");
 		}
+		if(isset($_GET['errorfecha'])){
+			printf("<script type='text/javascript'>alert('No ha seleccionado fecha'); </script>");
+		}
 	?>
 </head>
 <body>
 	<div class="izq">
-    <div class="field">
-      <input name="date"/>
-    </div>
+		<form class="" action="./php/getfecha.php" method="post">
+			<fieldset>
+				<div class="field">
+		      <input id="date" style="width:200px;" name="date"/>
+		    </div>
+			</fieldset>
+			<fieldset style="display:none;">
+				<input type="submit" name="button"></input>
+			</fieldset>
+		</form>
 	</div>
 	<nav id="header">
 	  <ul>
 	    <li><a href="./ordenes.php?id=0&clave=0&mesa=0">Órdenes</a></li>
 	    <li><a href="./inventario.php?id=0&clave=0&mesa=0">Inventario</a></li>
-	    <li><a href="./ventas.php">Ventas</a></li>
+	    <li><a href="./ventas.php?id=0">Ventas</a></li>
 	    <li style="background-color: gray; height: 30px; border-top-right-radius: 10px; border-top-left-radius: 10px; margin-left: 5px;"><a href="" style="font-weight: bold; color: black;">Corte</a></li>
 	    <li><a href="">Usuarios</a></li>
 	    <li><a href="">Sesión</a></li>
@@ -39,7 +49,7 @@
 			<button id="cerrarCobrar">
 				<i class="fa fa-times"></i>
 			</button>
-			<h4>HACER CORTE DE HOY</h4>
+			<h4>HACER CORTE DEL DÍA <?php echo $_GET['fecha']; ?></h4>
 			<form action="./php/cobrar.php" method="POST">
 				<fieldset>
 					<button style="margin-top:20px; margin-left: 43%;background-color:green;" type="submit" class="btn">Corte</button>
@@ -60,10 +70,12 @@
 			    </tr>
 					<?php
 						include './php/conexion.php';
-						$r=$mysqli->query("select * from categorias")or die($mysqli->error);
+						$r=$mysqli->query("select productos.categoria, sum(ventas.total) as total from productos,
+						 ventas where productos.idProducto = ventas.claveProducto and ventas.fecha='".$_GET['fecha']."' GROUP by productos.categoria")or die($mysqli->error);
 						while($cats=mysqli_fetch_array($r)){
 							echo "<tr>
-								<td>".$cats['categoria']."</td>";
+								<td>".$cats['categoria']."</td>
+								<td>".$cats['total']."</td>";
 						}
 						echo "</tr>";
 					?>
@@ -97,7 +109,6 @@
 <script src="./js/datepicker.js"></script>
   <script>
       var input = document.querySelector('input[name="date"]');
-
       var picker = datepicker(input);
   </script>
 <script type="text/javascript" src="./js/jquery-3.2.1.min.js"></script>

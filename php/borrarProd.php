@@ -1,10 +1,10 @@
-<?php 
+<?php
 	include 'conexion.php';
 	$prod=$_POST['producto2'];
 	$mesa=$_POST['mesa2'];
 	if(isset($_POST['producto2'])&&isset($_POST['mesa2'])){
-		if($mesa=="" && $prod==""){		
-			header("Location: ../ordenes.php?error=Campos Vacios");
+		if($mesa=="" && $prod=="" || $mesa=="0" || $prod=="0"){
+			header("Location: ../ordenes.php?errormesa=Campos Vacios&id=0&clave=0&mesa=0");
 		}else{
 			$getProd = $mysqli->query("select * from productos, detalle_orden where productos.idProducto=".$prod." and detalle_orden.idProducto=".$prod." and detalle_orden.idOrden=".$mesa)or die($mysqli->error);
 			if(mysqli_num_rows($getProd)==0){

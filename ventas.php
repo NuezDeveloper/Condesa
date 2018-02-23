@@ -20,7 +20,7 @@
 			<ul id="menu">
 				<?php
 					include './php/conexion.php';
-					$result=$mysqli->query("SELECT distinct idOrden FROM ventas where fecha = CURRENT_DATE")or die($mysqli->error);
+					$result=$mysqli->query("SELECT distinct idOrden FROM ventas where fecha = CURDATE()")or die($mysqli->error);
 					while ($ventas= mysqli_fetch_array($result)) {
 						echo "<li style='margin-left: 30%;font-weight: bold;'><a href='ventas.php?id=".$ventas['idOrden']."' name='".$ventas['idOrden']."'>Orden ".$ventas['idOrden']."</a>";
 						echo "</li>";
@@ -34,7 +34,7 @@
 	    <li><a href="./ordenes.php?id=0&clave=0&mesa=0">Órdenes</a></li>
 	    <li><a href="./inventario.php?id=0&clave=0&mesa=0">Inventario</a></li>
 	    <li style="background-color: gray; height: 30px; border-top-right-radius: 10px; border-top-left-radius: 10px; margin-left: 5px;"><a href="" style="font-weight: bold; color: black;">Ventas</a></li>
-	    <li><a href="./cortes.php">Corte</a></li>
+	    <li><a href="./cortes.php?fecha=CURDATE()">Corte</a></li>
 	    <li><a href="">Usuarios</a></li>
 	    <li><a href="">Sesión</a></li>
 	  </ul>
@@ -78,13 +78,20 @@
 		<button id="btnEnviar">Imprimir</button>
 		<hr>
 		<?php
-			$datos=$mysqli->query("select * from ventas where idOrden =".$_GET['id'])or die($mysqli->error);
+			$datos=$mysqli->query("select * from ventas, referencia where ventas.idOrden =".$_GET['id']." and referencia.idRef = ".$_GET['id'])or die($mysqli->error);
 			while($mostrar=mysqli_fetch_array($datos)){
-				$total=$mysqli->query("select sum(subtotal) as total from detalle_orden where idOrden=".$_GET['id'])or die($mysqli->error());
+				$total=$mysqli->query("select sum(total) as total2 from ventas where idOrden=".$_GET['id'])or die($mysqli->error());
 				echo "<div id='mostrarDatos'><label class='labels' style='margin-top: -260px; font-weight: bold; margin-left: 30px;'>Orden</label>
-						<label class='labels' style='margin-top: -240px; font-size: 15px; margin-left: 40px;'>".$mostrar['idOrden']."</label>";
+						<label class='labels' style='margin-top: -240px; font-size: 15px; margin-left: 40px;'>".$mostrar['idOrden']."</label>
+						<label class='labels' style='margin-top: -205px; font-weight: bold; margin-left: 30px;'>Mesa</label>
+						<label class='labels' style='margin-top: -180px; font-size: 15px; margin-left: 40px;'>".$mostrar['mesa']."</label>
+						<label class='labels' style='margin-top: -150px; font-weight: bold; margin-left: 30px;'>Mesero</label>
+						<label class='labels' style='margin-top: -125px; font-size: 15px; margin-left: 40px;'>".$mostrar['mesero']."</label>
+						<label class='labels' style='margin-top: -95px; font-weight: bold; margin-left: 30px;'>Referencia</label>
+						<label class='labels' style='margin-top: -70px; font-size: 15px; margin-left: 40px;'>".$mostrar['referencia']."</label>
+						<label class='labels' style='margin-top: 5px; font-weight: bold; margin-left: 30px;'>Total</label>";
 					if($existe=mysqli_fetch_array($total)){
-						echo "<label class='labels' style='margin-top: -10px; font-size: 15px; margin-left: 40px;'>".$existe['total']."</label>
+						echo "<label class='labels' style='margin-top: 25px; font-size: 15px; margin-left: 40px;'>".$existe['total2']."</label>
 						</div>";
 					}
 			}

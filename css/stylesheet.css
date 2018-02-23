@@ -1,12 +1,16 @@
 @import url('https://fonts.googleapis.com/css?family=Italianno');
+@import url('https://fonts.googleapis.com/css?family=Roboto');
 *{
 	padding: 0px;
 	margin: 0px;
 }
+a, p, label{
+	font-family: 'Roboto', sans-serif;
+}
 body div.izq{
 	background-color: #20375b;
 	width: 28%;
-	height: 677px;
+	height: 768px;
 	float: left;
   overflow-y:scroll;
 }
@@ -39,7 +43,7 @@ body div.miniheader form:last-child fieldset input{
   margin-top: 35px;
   background-image: url("../img/less.png");
 }
-body div.miniheader button:hover{
+button:hover{
   cursor: pointer;
 }
 input[type='submit']:hover{
@@ -68,6 +72,8 @@ body div.miniheader #ingre{
 body div input[type="search"]{
 	border: none;
 	color: white;
+	width: 150px;
+	font-size: 15px;
 	size: 25px;
 	height: 25px;
 	outline-color: transparent;
@@ -242,8 +248,8 @@ hr{
 }
 #tabla{
   width: 750px;
-  height: 280px;
-  margin-top: -25%;
+  height: 380px;
+  margin-top: -28%;
   margin-left: 44%;
   overflow-y:scroll;
 }

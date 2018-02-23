@@ -7,6 +7,14 @@
 	<link rel="stylesheet" href="./css/font-awesome.min.css">
 	<link rel="stylesheet" type="text/css" href="./css/stylesheet.css">
 	<link rel="stylesheet" type="text/css" href="./css/listas.css">
+	<?php
+		if(isset($_GET['erroring'])){
+			printf("<script type='text/javascript'>alert('No seleccionaste ningún producto'); </script>");
+		}
+		if(isset($_GET['errorproducto'])){
+			printf("<script type='text/javascript'>alert('Ya existe un producto con esa clave'); </script>");
+		}
+	?>
 </head>
 <body>
 	<div class="izq">
@@ -42,7 +50,7 @@
 	    <li><a href="./ordenes.php?id=0&clave=0&mesa=0">Órdenes</a></li>
 	    <li style="background-color: gray; height: 30px; border-top-right-radius: 10px; border-top-left-radius: 10px; margin-left: -7px;"><a href="" style="font-weight: bold; color: black;">Inventario</a></li>
 	    <li><a href="./ventas.php?id=0">Ventas</a></li>
-	    <li><a href="./cortes.php">Corte</a></li>
+	    <li><a href="./cortes.php?fecha=CURDATE()">Corte</a></li>
 	    <li><a href="">Usuarios</a></li>
 	    <li><a href="">Sesión</a></li>
 	  </ul>

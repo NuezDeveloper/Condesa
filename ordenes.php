@@ -11,12 +11,34 @@
 		if(isset($_GET['error'])){
 			printf("<script type='text/javascript'>alert('Favor de llenar todos los campos'); </script>");
 		}
+		if(isset($_GET['errormesa'])){
+			printf("<script type='text/javascript'>alert('No seleccionaste ninguna mesa para cobrar/eliminar'); </script>");
+		}
+		if(isset($_GET['errorprod'])){
+			printf("<script type='text/javascript'>alert('No seleccionaste ninguna mesa o producto para agregar/eliminar'); </script>");
+		}
+		if(isset($_GET['errormesamod'])){
+			printf("<script type='text/javascript'>alert('No seleccionaste ninguna mesa o producto para modificar'); </script>");
+		}
+		if(isset($_GET['errorp'])){
+			printf("<script type='text/javascript'>alert('El producto no existe'); </script>");
+		}
 	?>
 </head>
 <body>
 	<div class="izq">
-		<input type="search" id="txtBuscar" placeholder="Buscar">
-		<div>
+		<form class="" action="./php/agregarProdClave.php" method="POST">
+			<fieldset style="margin-left:-20px;margin-top:-14px;">
+				<input type="search" name="clave" placeholder="Buscar">
+			</fieldset>
+			<fieldset style="display:none;">
+				<input type="text" name="mesa" value=<?php echo $_GET['mesa']?>>
+			</fieldset>
+			<fieldset style="display:none;">
+				<input type="submit" value="">
+			</fieldset>
+		</form>
+		<div style="margin-top:15px;">
 			<ul id="menu">
 				<?php
 					include './php/conexion.php';
@@ -26,7 +48,6 @@
 						$cat1=$categorias['categoria'];
 						//imprime el nombre de la categoria
 						echo "<li><input type='checkbox' name='list' id='nivel1-".$categorias['idCategoria']."'><label for='nivel1-".$categorias['idCategoria']."'>".$categorias['categoria']."</label>";
-
 						//obtiene los nombres de las subcategorias pertenecientes a esa categoria
 						$result2 = $mysqli->query("SELECT * FROM productos WHERE categoria LIKE '%$cat1%'") or die($mysqli->error);
 						//mientras haya registros los imprime
@@ -48,7 +69,7 @@
 	    <li style="background-color: gray; height: 30px; border-top-right-radius: 10px; border-top-left-radius: 10px; margin-left: 5px;"><a href="" style="font-weight: bold; color: black;">Órdenes</a></li>
 	    <li><a href="./inventario.php?id=0&clave=0&mesa=0">Inventario</a></li>
 	    <li><a href="./ventas.php?id=0">Ventas</a></li>
-	    <li><a href="./cortes.php">Corte</a></li>
+	    <li><a href="./cortes.php?fecha=CURDATE()">Corte</a></li>
 	    <li><a href="">Usuarios</a></li>
 	    <li><a href="">Sesión</a></li>
 	  </ul>
@@ -77,7 +98,7 @@
 				<input type="text" name="mesa" value=<?php echo $_GET['mesa']?>>
 			</fieldset>
 			<fieldset>
-				<input type="submit" value="">
+				<input type="submit" value="" id="btnplus">
 			</fieldset>
 		</form>
 		<form action="./php/borrarProd.php" method="POST">
@@ -88,7 +109,7 @@
 				<input type="text" name="mesa2" value=<?php echo $_GET['mesa']?>>
 			</fieldset>
 			<fieldset>
-				<input type="submit" value="">
+				<input type="submit" value="" id="btnless">
 			</fieldset>
 		</form>
 	</div>
@@ -101,7 +122,7 @@
 		?>
 		<div id="mesas">
 			<?php
-				$mesas = $mysqli->query("select * from referencia");
+				$mesas = $mysqli->query("select * from referencia where estatus != 'completa'");
 				while($filaMesas = mysqli_fetch_array($mesas)){
 					$valor=$filaMesas['mesa'];
 					if($valor=='llevar'){
@@ -199,18 +220,19 @@
 					</table>
 				</div>
 				<fieldset style="width:30%; margin-top: -10px; float: left;">Pago:
-					<input type="number" name="txtPagar" value="" style="border: 1px solid red; text-align: center;">
+					<input id="txtPay" onkeyup="asd()" onkeypress="exec()" type="number" name="txtPagar" value="" style="border: 1px solid red; text-align: center;">
 				</fieldset>
-				<fieldset style="margin-left:50%;float: left;margin-top:-10px;">Cambio:
-					<label>100.00</label>
+				<fieldset style="margin-left:40%;float: left;margin-top:-10px;">Cambio:
+					<label id="lblcambio">0</label>
 				</fieldset>
 				<br>
 				<fieldset style="display: none;">
 					<input type="text" name="id" value=<?php echo $_GET['mesa'];?>>
 				</fieldset>
 				<br>
+				<br>
 				<fieldset>
-					<button style="margin-top: 15px; margin-left: 10%; background-color:green;" type="submit" class="btn">Cobrar</button>
+					<button style="margin-top: 15px; align:center; background-color:green;" type="submit" class="btn" id="realizarPago">Cobrar</button>
 				</fieldset>
 			</form>
 		</div>
@@ -235,7 +257,7 @@
 			</form>
 		</div>
 		<button id="btnEnviar">ENVIAR</button>
-		<hr>
+		<hr id="hr">
 		<button id="refresh"></button>
 		<div id="modificarMesa" style="top: 20px;">
 			<button id="cerrarModificarMesa">
@@ -296,6 +318,7 @@
 				</fieldset>
 			</form>
 		</div>
+
 		<?php
 			$datos=$mysqli->query("select * from orden, referencia where orden.idOrden = referencia.idRef and referencia.idRef=".$_GET['mesa'])or die($mysqli->error);
 			while($mostrar=mysqli_fetch_array($datos)){
@@ -310,7 +333,7 @@
 						<label class='labels' style='margin-top: -70px; font-size: 15px; margin-left: 40px;'>".$mostrar['referencia']."</label>
 						<label class='labels' style='margin-top: 5px; font-weight: bold; margin-left: 30px;'>Total</label>";
 					if($existe=mysqli_fetch_array($total)){
-						echo "<label class='labels' style='margin-top: 5px; font-size: 15px; margin-left: 95px;'>".$existe['total']."</label>
+						echo "<label id='lbltotal' class='labels' style='margin-top: 5px; font-size: 15px; margin-left: 95px;'>".$existe['total']."</label>
 						</div>";
 					}
 			}
@@ -350,8 +373,7 @@
 											  background-image: url(./img/plus.png);
 											  background-size: cover;
 											  background-color: transparent;
-											  border: none;
-											  position: absolute;'>
+											  border: none;'>
 											</fieldset>
 										</form>
 										<form action='./php/borrarProd.php' method='POST'>
@@ -361,16 +383,15 @@
 											<fieldset style='display: none;'>
 												<input type='text' name='mesa2' value=".$_GET['mesa'].">
 											</fieldset>
-											<fieldset>
+											<fieldset style='margin-top: -44px;'>
 												<input type='submit' value='' style='height: 20px;
 											  width: 20px;
 											  margin-left: 50px;
-											  margin-top: -30px;
+											  margin-top: -20px;
 											  background-image: url(./img/less.png);
 											  background-size: cover;
 											  background-color: transparent;
-											  border: none;
-											  position: absolute;'>
+											  border: none;'>
 											</fieldset>
 										</form></td>
 							  </tr>";
@@ -381,6 +402,30 @@
 			</table>
 		</div>
 	</div>
+	<script type="text/javascript">
+		function asd(e){
+			var txt = document.getElementById('txtPay').value;
+			var tot = parseInt(document.getElementById('lbltotal').innerHTML);
+			var t = parseInt(txt);
+			if(t-tot<0){
+				document.getElementById('lblcambio').innerText="INCOMPLETO";
+				document.getElementById('realizarPago').style.display='none';
+			}else{
+				document.getElementById('lblcambio').innerText="$"+(t-tot);
+			}
+			if(t>=tot){
+				document.getElementById('txtPay').style.border="1px solid green";
+				document.getElementById('realizarPago').style.display='block';
+				document.getElementById('realizarPago').type="submit";
+			}else{
+				document.getElementById('txtPay').style.border="1px solid red";
+				document.getElementById('realizarPago').type="button";
+			}
+			if(txt==""){
+				document.getElementById('lblcambio').innerText="";
+			}
+		}
+	</script>
 	<script type="text/javascript">
 		var si=false;
 		window.addEventListener('load',function (argument) {
@@ -417,6 +462,7 @@
         div.style.display="block";
         div.className +="iniciar";
         si=true;
+				document.getElementById("txtPay").focus();
       }
     });
     document.getElementById("cerrarCobrar").addEventListener('click',function(){
